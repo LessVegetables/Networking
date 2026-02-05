@@ -10,7 +10,7 @@ import platform    # For getting the operating system name
 import subprocess  # For executing a shell command
 
 
-class ping_result():
+class Ping_result():
     def __init__(self, data:str):
         #закройте глаза
         dataArrayed = data.split()
@@ -54,7 +54,14 @@ def write_result_to_csv(filepath, data, arg=['domain', 'ip', 'time', 'received']
         spamwriter.writerow(arg)
 
         for pinged_domain in data:
-            spamwriter.writerow(pinged_domain)
+            row = [
+                pinged_domain.domain,
+                pinged_domain.ip,
+                pinged_domain.time,
+                pinged_domain.packagesRecieved
+            ]
+
+            spamwriter.writerow(row)
 
 
 def main():
@@ -65,7 +72,10 @@ def main():
         if domain == 'domain':
             continue
         return_data = ping(domain[0])
-        ping_result.append(return_data)
+
+        pigned_domain_result = Ping_result(return_data)
+
+        ping_result.append(pigned_domain_result)
 
     write_result_to_csv("ping_results.csv", ping_result)
 
