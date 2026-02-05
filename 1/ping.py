@@ -6,6 +6,9 @@ import platform
 import subprocess
 
 
+INPUT = "/Users/danielgehrman/Documents/Programming/Uni/Networking/1/domains.csv"
+OUTPUT = "/Users/danielgehrman/Documents/Programming/Uni/Networking/1/ping_results.csv"
+
 class Ping_result():
     def __init__(self, data:str):
         #закройте глаза
@@ -30,7 +33,7 @@ def ping(host):
 
     param = '-n' if platform.system().lower()=='windows' else '-c'
     command = ['ping', param, '1', host]
-    return subprocess.run(command, capture_output=True).stdout
+    return subprocess.run(command, capture_output=True).stdout.decode()
 
 
 def get_domains_from_csv(filepath):
@@ -38,7 +41,7 @@ def get_domains_from_csv(filepath):
     with open(filepath, newline='') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
         for row in spamreader:
-            data.append(row)
+            data.append(row[0])
     return data
 
 
@@ -61,19 +64,19 @@ def write_result_to_csv(filepath, data, arg=['domain', 'ip', 'time', 'received']
 
 
 def main():
-    domains = get_domains_from_csv("domains.csv")
+    domains = get_domains_from_csv(INPUT)
     ping_result = []
 
     for domain in domains:
         if domain == 'domain':
             continue
-        return_data = ping(domain[0])
+        return_data = ping(domain)
 
         pigned_domain_result = Ping_result(return_data)
 
         ping_result.append(pigned_domain_result)
 
-    write_result_to_csv("ping_results.csv", ping_result)
+    write_result_to_csv(OUTPUT, ping_result)
 
 
 if __name__ == "__main__":
