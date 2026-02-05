@@ -1,13 +1,9 @@
 # 1. Пингануть 10 доменов, вывести результаты в csv таблице.
 # в качестве результатов предоставить RTT и 3 других параметра на ваше усмотрение
 
-# Source - https://stackoverflow.com/a/32684938
-# Posted by ePi272314, modified by community. See post 'Timeline' for change history
-# Retrieved 2026-02-05, License - CC BY-SA 4.0
-
 import csv
-import platform    # For getting the operating system name
-import subprocess  # For executing a shell command
+import platform
+import subprocess
 
 
 class Ping_result():
@@ -26,14 +22,14 @@ def ping(host):
     """
     Returns True if host (str) responds to a ping request.
     Remember that a host may not respond to a ping (ICMP) request even if the host name is valid.
+
+    Source - https://stackoverflow.com/a/32684938
+    Posted by ePi272314, modified by community. See post 'Timeline' for change history
+    Retrieved 2026-02-05, License - CC BY-SA 4.0
     """
 
-    # Option for the number of packets as a function of
     param = '-n' if platform.system().lower()=='windows' else '-c'
-
-    # Building the command. Ex: "ping -c 1 google.com"
     command = ['ping', param, '1', host]
-
     return subprocess.run(command, capture_output=True).stdout
 
 
