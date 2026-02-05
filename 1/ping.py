@@ -11,14 +11,15 @@ import subprocess  # For executing a shell command
 
 
 class ping_result():
-    def __init__(self):
-        self.data = []
-    pass
-
-
-def string_to_ping_object(result):
-
-    ping = ping_result()
+    def __init__(self, data:str):
+        #закройте глаза
+        dataArrayed = data.split()
+        self.domain = dataArrayed[1]
+        self.ip = dataArrayed[2][1:-2]
+        self.time = dataArrayed[12].split("=")[-1]
+        self.packagesRecieved = dataArrayed[25]
+        self.allData = dataArrayed
+        #можете открыть глаза
 
 
 def ping(host):
@@ -45,7 +46,7 @@ def get_domains_from_csv(filepath):
     return data
 
 
-def write_result_to_csv(filepath, data, arg=['domain', 'time', 'ttl', 'ip']):
+def write_result_to_csv(filepath, data, arg=['domain', 'ip', 'time', 'received']):
 
     with open(filepath, 'w', newline='') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',',
