@@ -16,7 +16,7 @@ class Ping_result():
         self.domain = dataArrayed[1]
         self.ip = dataArrayed[2][1:-2]
         self.time = dataArrayed[12].split("=")[-1]
-        self.packagesRecieved = dataArrayed[25]
+        self.packetLoss = dataArrayed[25]
         self.allData = dataArrayed
         #можно открыть глаза
 
@@ -45,7 +45,7 @@ def get_domains_from_csv(filepath):
     return data
 
 
-def write_result_to_csv(filepath, data, arg=['domain', 'ip', 'time', 'received']):
+def write_result_to_csv(filepath, data, arg=['domain', 'ip', 'time', 'packetLoss']):
 
     with open(filepath, 'w', newline='') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',',
@@ -53,12 +53,14 @@ def write_result_to_csv(filepath, data, arg=['domain', 'ip', 'time', 'received']
         spamwriter.writerow(arg)
 
         for pinged_domain in data:
-            row = [
-                pinged_domain.domain,
-                pinged_domain.ip,
-                pinged_domain.time,
-                pinged_domain.packagesRecieved
-            ]
+            row = [getattr(pinged_domain, i) for i in arg]
+
+            # row = [
+            #     pinged_domain.domain,
+            #     pinged_domain.ip,
+            #     pinged_domain.time,
+            #     pinged_domain.packetLoss
+            # ]
 
             spamwriter.writerow(row)
 
