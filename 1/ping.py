@@ -19,7 +19,7 @@ class ping_result():
         self.time = dataArrayed[12].split("=")[-1]
         self.packagesRecieved = dataArrayed[25]
         self.allData = dataArrayed
-        #можете открыть глаза
+        #можно открыть глаза
 
 
 def ping(host):
