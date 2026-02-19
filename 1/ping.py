@@ -1,9 +1,9 @@
-# 1. Пингануть 10 доменов, вывести результаты в csv таблице.
-# в качестве результатов предоставить RTT и 3 других параметра на ваше усмотрение
-
 import csv
 import platform
 import subprocess
+
+# 1. Пингануть 10 доменов, вывести результаты в csv таблице.
+# в качестве результатов предоставить RTT и 3 других параметра на ваше усмотрение
 
 
 INPUT = "/Users/danielgehrman/Documents/Programming/Uni/Networking/1/domains.csv"
