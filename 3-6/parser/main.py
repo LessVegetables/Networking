@@ -8,7 +8,7 @@ import regex
 BASE_URL = 'https://t.me/s/'
 CHANNEL = 'd_code'
 
-FLAGS = ["post_id", "post_link", "author_name", "author_link", "datetime", "last_scrape_datetime", "content_text", "content_img", "views"]
+FLAGS = ["post_id", "post_link", "author_name", "author_link", "datetime", "last_scrape_datetime", "views", "content_text", "content_img"]
 
 class Post():
     FIELDS = {
@@ -18,9 +18,9 @@ class Post():
         "author_link":          lambda self: self.author_link,
         "datetime":             lambda self: self.datetime,
         "last_scrape_datetime": lambda self: self.last_scrape_datetime,
+        "views":                lambda self: self.views,
         "content_text":         lambda self: ' '.join(self.content_text.split()),
         "content_img":          lambda self: self.content_img,
-        "views":                lambda self: self.views,
     }
 
     def __init__(self, post_data:Locator):
@@ -30,7 +30,8 @@ class Post():
         self.author_name = post_data.locator('.tgme_widget_message_owner_name').inner_text()
         self.author_link = post_data.locator('.tgme_widget_message_owner_name').get_attribute('href')
 
-        self.datetime = post_data.locator("time").get_attribute("datetime")
+        self.datetime = post_data.locator("time[datetime]").get_attribute("datetime")
+
         self.last_scrape_datetime = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
         self.content_text = post_data.locator('.tgme_widget_message_text.js-message_text').inner_text()
@@ -120,9 +121,7 @@ def main():
 
     # If none passed — all are on by default
     if not active_flags:
-        active_flags = set(FLAGS)
-
-    print(active_flags)  # the set of "on" flags you act on
+        active_flags = FLAGS
     
     channel_username = args.channel_username
     if channel_username[0] != '@':
@@ -131,8 +130,9 @@ def main():
         return 2
 
     print(f"Parsing channel: {args.channel_username}")
+    print(f"And saving: {' '.join(active_flags)}")
 
-    posts = [Post]
+    posts = []
 
     with sync_playwright() as p:
         print("Starting playwright...")
@@ -147,20 +147,43 @@ def main():
             return 2
 
         print("Parsing the posts...")
-        all_posts = page.locator('.tgme_widget_message_wrap').all()
 
-        with open(args.o, "w") as f:
-            # f.write("post_id,post_link,author_name,author_link,datetime,last_scrape_datetime,(content_text),content_img,views\n")
-            f.write(",".join(str(fn) for fn in active_flags) + "\n")
+        if args.last:
+            amount = int(args.last[0])
+            unit = args.last[1]
+            print(f"Parsing the last {amount} {unit}...")
+        
+            if unit == 'p': # if unit is "posts" keep scrolling up until the count of .tgme_.... is >= the sought for ammount
+                loaded_posts_count = page.locator('.tgme_widget_message_wrap').count()
+                while loaded_posts_count < amount:
+                    page.locator('.tgme_widget_message_wrap').first.scroll_into_view_if_needed()
+                    loaded_posts_count = page.locator('.tgme_widget_message_wrap').count()
+                
+                all_posts = page.locator('.tgme_widget_message_wrap').all()
+                for i in range(1, amount + 1):
+                    post = all_posts[-i]
+                    posts.append(Post(post))
 
+            else: # if unit is the time ...i suppose do the same haha
+                #replace with the actual logic
+                pass
+
+        else: # just parse what gets loaded
+            all_posts = page.locator('.tgme_widget_message_wrap').all()
             for post in all_posts:
                 posts.append(Post(post))
 
-                f.write(posts[-1].serialize(active_flags) + "\n")
-
         browser.close()
 
-        print(f"Done! Output saved here: {args.o}\nGoodbye")
+    print(f"Saving to: {args.o}")
+    # writing posts to output file
+    with open(args.o, "w") as f:
+        f.write(",".join(active_flags) + "\n")
+        
+        for post in posts:
+            f.write(post.serialize(active_flags) + "\n")
+
+    print(f"Done!\nGoodbye")
     
 
 if __name__ == '__main__':
