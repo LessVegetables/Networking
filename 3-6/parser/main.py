@@ -82,7 +82,7 @@ class Post():
         return self.serialize()
 
 
-def parser_init() -> argparse.ArgumentParser:
+def parser_init():
     parser = argparse.ArgumentParser(
                     prog='TChannel Parser',
                     description='Parses telegram channels. Outputs the contents into csv file.'
