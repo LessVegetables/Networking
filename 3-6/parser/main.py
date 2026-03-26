@@ -90,13 +90,16 @@ def main():
         print("Parsing the posts...")
         all_posts = page.locator('.tgme_widget_message_wrap').all()
 
-        for post in all_posts:
-            posts.append(Post(post))
+        with open("output.csv", "w") as f:
+            f.write("post_id,post_link,author_name,author_link,datetime,last_scrape_datetime,(content_text),content_img,views\n")
+            for post in all_posts:
+                posts.append(Post(post))
 
-            print(posts[-1])
+                f.write(str(posts[-1])+"\n")
 
-        # page.wait_for_timeout(10000)
         browser.close()
+
+        print("Done!\nGoodbye")
     
 
 if __name__ == '__main__':
