@@ -80,12 +80,17 @@ class Post():
         return self.serialize()
 
 
-def main():
+def parser_init() -> argparse.ArgumentParser:
+    FLAGS = ["post_id", "date", "views", "text", "author", "media", "links", "replies", "forwards", "reactions"]
 
+    
     parser = argparse.ArgumentParser(
                     prog='TChannel Parser',
                     description='Parses telegram channels. Outputs the contents into csv file.'
                     )
+    
+    for flag in FLAGS:
+        parser.add_argument(f"--{flag}", action="store_true")
 
     parser.add_argument('channel_username', help='The channel username to parse <@username>')
     parser.add_argument('-o', default='output.csv', help='set the output file')
@@ -96,8 +101,14 @@ def main():
         help="--last <N> <p|h|d>  e.g. \"--last 5 d\" to parse the last 5 days of posts (h - hours); \"--last 10 p\" for the last 10 posts."
     )
 
-    args = parser.parse_args()
+    return parser
 
+
+
+def main():
+
+    parser = parser_init()
+    args = parser.parse_args()
     if args.last:
         try:
             amount = int(args.last[0])
@@ -106,8 +117,6 @@ def main():
                 raise ValueError
         except (IndexError, ValueError):
             parser.error("Usage: --last <N> <p|h|d>  e.g. --last 2 d")
-
-
     
     channel_username = args.channel_username
     if channel_username[0] != '@':
