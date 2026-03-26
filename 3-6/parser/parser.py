@@ -103,10 +103,19 @@ def arg_parser_init():
     return parser
 
 
-def parse():
+def parse(channel_username=None, o='output.csv', last=None, **flags):
 
     parser = arg_parser_init()
-    args = parser.parse_args()
+
+    if channel_username is None: #called directly
+        args = parser.parse_args()
+    else: # function call
+        args = parser.parse_args([channel_username])
+        args.o = o
+        args.last = last
+        for flag in FLAGS:
+            setattr(args, flag, flags.get(flag, False))
+
     if args.last:
         try:
             amount = int(args.last[0])
