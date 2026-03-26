@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from playwright.sync_api import sync_playwright, Locator
 import regex
@@ -165,8 +165,35 @@ def main():
                     posts.append(Post(post))
 
             else: # if unit is the time ...i suppose do the same haha
-                #replace with the actual logic
-                pass
+                oldest_loaded_post_datetime = datetime.fromisoformat(page.locator('.tgme_widget_message_wrap').first.locator("time[datetime]").get_attribute("datetime"))
+                datetime_now = datetime.now(timezone.utc).replace(microsecond=0)
+
+                if unit == 'h':
+                    datetime_then = datetime_now - timedelta(hours=amount)
+                elif unit == 'd':
+                    datetime_then = datetime_now - timedelta(days=amount)
+                else:
+                    print("bro 'h', 'd' or 'p' nothing else")
+                    return 2
+
+                # print(f"now: {datetime_now}\tthen:{datetime_then}\t{oldest_loaded_post_datetime=}")
+                # print(datetime_then < oldest_loaded_post_datetime)
+
+                while oldest_loaded_post_datetime > datetime_then:
+                    page.locator('.tgme_widget_message_wrap').first.scroll_into_view_if_needed()
+                    oldest_loaded_post_datetime = datetime.fromisoformat(page.locator('.tgme_widget_message_wrap').first.locator("time[datetime]").get_attribute("datetime"))
+                
+
+                all_posts = page.locator('.tgme_widget_message_wrap').all()
+                for post in all_posts:
+                    post_datetime = datetime.fromisoformat(post.locator("time[datetime]").get_attribute("datetime"))
+
+                    # print(f"post_datetime > datetime_then {post_datetime > datetime_then}")
+
+                    if post_datetime < datetime_then:
+                        continue
+                    posts.append(Post(post))
+                
 
         else: # just parse what gets loaded
             all_posts = page.locator('.tgme_widget_message_wrap').all()
