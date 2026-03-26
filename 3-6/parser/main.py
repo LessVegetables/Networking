@@ -1,3 +1,4 @@
+import argparse
 from datetime import datetime, timezone
 
 from playwright.sync_api import sync_playwright, Locator
@@ -9,6 +10,18 @@ CHANNEL = 'd_code'
 
 
 class Post():
+    FIELDS = {
+        "post_id":              lambda self: self.post_id,
+        "post_link":            lambda self: self.post_link,
+        "author_name":          lambda self: self.author_name,
+        "author_link":          lambda self: self.author_link,
+        "datetime":             lambda self: self.datetime,
+        "last_scrape_datetime": lambda self: self.last_scrape_datetime,
+        "content_text":         lambda self: ' '.join(self.content_text.split()),
+        "content_img":          lambda self: self.content_img,
+        "views":                lambda self: self.views,
+    }
+
     def __init__(self, post_data:Locator):
         self.post_id = post_data.locator('.tgme_widget_message.text_not_supported_wrap').get_attribute('data-post')
         self.post_link = post_data.locator('.tgme_widget_message_date').get_attribute('href')
@@ -56,22 +69,53 @@ class Post():
         # else:
         #     self.views = int(str_views)
 
+    def serialize(self, wanted: set[str] = None):
+        fields = self.FIELDS if wanted is None else {
+            k: v for k, v in self.FIELDS.items() if k in wanted
+        }
+        return ",".join(str(fn(self)) for fn in fields.values())
+
     def __str__(self):
-        out = f"{self.post_id},{self.post_link},{self.author_name},{self.author_link},{self.datetime},{self.last_scrape_datetime},\({' '.join((self.content_text).split())}\),{self.content_img},{self.views}"
-        return out
+        # out = f"{self.post_id},{self.post_link},{self.author_name},{self.author_link},{self.datetime},{self.last_scrape_datetime},\({' '.join((self.content_text).split())}\),{self.content_img},{self.views}"
+        return self.serialize()
 
 
 def main():
 
-    while True:
-        print("Enter the channel username to parse <@username>: ", end="")
-        channel_username = input()
-        if channel_username[0] != '@':
-            print("Invalid format!")
-        elif channel_username == '':
-            print("That's not a username at all!")
-        else:
-            break
+    parser = argparse.ArgumentParser(
+                    prog='TChannel Parser',
+                    description='Parses telegram channels. Outputs the contents into csv file.'
+                    )
+
+    parser.add_argument('channel_username', help='The channel username to parse <@username>')
+    parser.add_argument('-o', default='output.csv', help='set the output file')
+    parser.add_argument(
+        "--last",
+        nargs="+",
+        metavar=("N", "p|d"),
+        help="--last <N> <p|h|d>  e.g. \"--last 5 d\" to parse the last 5 days of posts (h - hours); \"--last 10 p\" for the last 10 posts."
+    )
+
+    args = parser.parse_args()
+
+    if args.last:
+        try:
+            amount = int(args.last[0])
+            unit = args.last[1]
+            if unit not in ("p", "h", "d"):
+                raise ValueError
+        except (IndexError, ValueError):
+            parser.error("Usage: --last <N> <p|h|d>  e.g. --last 2 d")
+
+
+    
+    channel_username = args.channel_username
+    if channel_username[0] != '@':
+        print("Invalid format!")
+        parser.print_help()
+        return 2
+
+    print(f"Parsing channel: {args.channel_username}")
 
     posts = []
 
@@ -85,12 +129,12 @@ def main():
         # check to see what ended up loading (the channel page or telegram.org fallback)
         if page.url != (BASE_URL + channel_username[1:]):
             print(f'{page.url} loaded instead! This ain\'t a channel!!! Goodbye')
-            return
+            return 2
 
         print("Parsing the posts...")
         all_posts = page.locator('.tgme_widget_message_wrap').all()
 
-        with open("output.csv", "w") as f:
+        with open(args.o, "w") as f:
             f.write("post_id,post_link,author_name,author_link,datetime,last_scrape_datetime,(content_text),content_img,views\n")
             for post in all_posts:
                 posts.append(Post(post))
@@ -99,7 +143,7 @@ def main():
 
         browser.close()
 
-        print("Done!\nGoodbye")
+        print(f"Done! Output saved here: {args.o}\nGoodbye")
     
 
 if __name__ == '__main__':
