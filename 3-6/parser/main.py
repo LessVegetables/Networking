@@ -8,6 +8,7 @@ import regex
 BASE_URL = 'https://t.me/s/'
 CHANNEL = 'd_code'
 
+FLAGS = ["post_id", "post_link", "author_name", "author_link", "datetime", "last_scrape_datetime", "content_text", "content_img", "views"]
 
 class Post():
     FIELDS = {
@@ -81,9 +82,6 @@ class Post():
 
 
 def parser_init() -> argparse.ArgumentParser:
-    FLAGS = ["post_id", "date", "views", "text", "author", "media", "links", "replies", "forwards", "reactions"]
-
-    
     parser = argparse.ArgumentParser(
                     prog='TChannel Parser',
                     description='Parses telegram channels. Outputs the contents into csv file.'
@@ -104,7 +102,6 @@ def parser_init() -> argparse.ArgumentParser:
     return parser
 
 
-
 def main():
 
     parser = parser_init()
@@ -118,6 +115,15 @@ def main():
         except (IndexError, ValueError):
             parser.error("Usage: --last <N> <p|h|d>  e.g. --last 2 d")
     
+    # Check if any flag was explicitly passed
+    active_flags = {flag for flag in FLAGS if getattr(args, flag)}
+
+    # If none passed — all are on by default
+    if not active_flags:
+        active_flags = set(FLAGS)
+
+    print(active_flags)  # the set of "on" flags you act on
+    
     channel_username = args.channel_username
     if channel_username[0] != '@':
         print("Invalid format!")
@@ -126,7 +132,7 @@ def main():
 
     print(f"Parsing channel: {args.channel_username}")
 
-    posts = []
+    posts = [Post]
 
     with sync_playwright() as p:
         print("Starting playwright...")
@@ -144,11 +150,13 @@ def main():
         all_posts = page.locator('.tgme_widget_message_wrap').all()
 
         with open(args.o, "w") as f:
-            f.write("post_id,post_link,author_name,author_link,datetime,last_scrape_datetime,(content_text),content_img,views\n")
+            # f.write("post_id,post_link,author_name,author_link,datetime,last_scrape_datetime,(content_text),content_img,views\n")
+            f.write(",".join(str(fn) for fn in active_flags) + "\n")
+
             for post in all_posts:
                 posts.append(Post(post))
 
-                f.write(str(posts[-1])+"\n")
+                f.write(posts[-1].serialize(active_flags) + "\n")
 
         browser.close()
 
