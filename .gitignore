@@ -208,3 +208,5 @@ __marimo__/
 
 # macos
 .DS_store
+
+output.csv
