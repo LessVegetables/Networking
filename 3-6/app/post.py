@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import regex
 
 from playwright.sync_api import Locator
 

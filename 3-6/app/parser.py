@@ -2,7 +2,6 @@ import argparse
 from datetime import datetime, timezone, timedelta
 
 from playwright.sync_api import sync_playwright
-import regex
 
 from post import Post
 
@@ -79,8 +78,8 @@ def parse(channel_username=None, o=None, last=None, **flags):
         browser =  p.webkit.launch()
         page =  browser.new_page()
         print("Loading page...")
-        # page.goto(BASE_URL + channel_username[1:]) <–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-        page.goto("localhost:8000")
+        page.goto(BASE_URL + channel_username[1:]) # <–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+        # page.goto("localhost:8000")
         # check to see what ended up loading (the channel page or telegram.org fallback)
         if page.url != (BASE_URL + channel_username[1:]):
             print(f'{page.url} loaded instead! This ain\'t a channel!!! Goodbye')

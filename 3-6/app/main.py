@@ -13,6 +13,6 @@ def read_root():
 @app.get("/parse/{item_id}")
 def read_item(item_id: int, q: str | None = None):
     # return {"item_id": item_id, "q": q}
-    parse('@some_channel', o='out.csv', last=['5', 'd'], views=True, content_text=True)
+    parse('@d_code', o='out.csv', last=['5', 'd'], views=True, content_text=True)
 
     return 
