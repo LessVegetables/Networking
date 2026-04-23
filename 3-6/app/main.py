@@ -1,6 +1,8 @@
 from fastapi import FastAPI
-from ..parser import parse
+from parser import parse
 
+# ADD channel_id PARSE
+# INT the view count
 
 app = FastAPI()
 
@@ -10,5 +12,7 @@ def read_root():
 
 @app.get("/parse/{item_id}")
 def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}
+    # return {"item_id": item_id, "q": q}
     parse('@some_channel', o='out.csv', last=['5', 'd'], views=True, content_text=True)
+
+    return 
