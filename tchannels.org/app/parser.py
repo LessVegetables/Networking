@@ -113,6 +113,7 @@ def parse(channel_username=None, o=None, last=None, **flags):
                     datetime_then = datetime_now - timedelta(days=amount)
                 else:
                     print("bro 'h', 'd' or 'p' nothing else")
+                    browser.close()
                     return 2
 
                 # print(f"now: {datetime_now}\tthen:{datetime_then}\t{oldest_loaded_post_datetime=}")
