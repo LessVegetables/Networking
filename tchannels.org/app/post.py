@@ -76,3 +76,26 @@ class Post():
     def __str__(self):
         # out = f"{self.post_id},{self.post_link},{self.author_name},{self.author_link},{self.datetime},{self.last_scrape_datetime},\({' '.join((self.content_text).split())}\),{self.content_img},{self.views}"
         return self.serialize()
+
+    def _parse_views(s: str) -> int:
+        s = s.strip()
+        if s.endswith("K"):
+            return round(float(s[:-1]) * 1_000)
+        elif s.endswith("M"):
+            return round(float(s[:-1]) * 1_000_000)
+        return int(s)
+    
+    def to_db(self) -> dict:
+        channel_id, post_id = self.post_id.split("/")
+
+        return {
+            "post_id":              int(post_id),
+            "channel_id":           channel_id,
+            "author_name":          self.author_name,
+            "post_datetime":        datetime.fromisoformat(self.datetime),
+            "last_scrape_datetime": datetime.fromisoformat(self.last_scrape_datetime),
+            "views":                self._parse_views(self.views),
+            "content_text":        ' '.join(self.content_text.split()),
+            "content_img":          self.content_img,
+        }
+
