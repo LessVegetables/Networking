@@ -9,7 +9,7 @@ class Post():
         "post_link":            lambda self: self.post_link,
         "author_name":          lambda self: self.author_name,
         "author_link":          lambda self: self.author_link,
-        "datetime":             lambda self: self.datetime,
+        "datetime":             lambda self: self.post_datetime,
         "last_scrape_datetime": lambda self: self.last_scrape_datetime,
         "views":                lambda self: self.views,
         "content_text":         lambda self: ' '.join(self.content_text.split()),
@@ -23,7 +23,7 @@ class Post():
         self.author_name = post_data.locator('.tgme_widget_message_owner_name').inner_text()
         self.author_link = post_data.locator('.tgme_widget_message_owner_name').get_attribute('href')
 
-        self.datetime = post_data.locator("time[datetime]").get_attribute("datetime")
+        self.post_datetime = post_data.locator("time[datetime]").get_attribute("datetime")
 
         self.last_scrape_datetime = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
@@ -74,7 +74,7 @@ class Post():
         pass
 
     def __str__(self):
-        # out = f"{self.post_id},{self.post_link},{self.author_name},{self.author_link},{self.datetime},{self.last_scrape_datetime},\({' '.join((self.content_text).split())}\),{self.content_img},{self.views}"
+        # out = f"{self.post_id},{self.post_link},{self.author_name},{self.author_link},{self.post_datetime},{self.last_scrape_datetime},\({' '.join((self.content_text).split())}\),{self.content_img},{self.views}"
         return self.serialize()
 
     def _parse_views(s: str) -> int:
@@ -92,7 +92,7 @@ class Post():
             "post_id":              int(post_id),
             "channel_id":           channel_id,
             "author_name":          self.author_name,
-            "post_datetime":        datetime.fromisoformat(self.datetime),
+            "post_datetime":        datetime.fromisoformat(self.post_datetime),
             "last_scrape_datetime": datetime.fromisoformat(self.last_scrape_datetime),
             "views":                self._parse_views(self.views),
             "content_text":        ' '.join(self.content_text.split()),
