@@ -2,4 +2,4 @@ FROM python:latest as main
 WORKDIR /app
 COPY . .
 RUN pip3 install -r requirements.txt
-CMD ["fastapi", "run", "main.py"]
+CMD ["fastapi", "run", "main.py", "--port", "80", "--proxy-headers"]

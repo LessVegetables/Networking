@@ -72,7 +72,8 @@ class Post(Base):
         return {k: fn(self) for k, fn in fields.items()}
 
 # engine = create_engine("sqlite:///temp.db", echo=True)
-engine = create_engine("postgresql+psycopg://danielgehrman:@localhost:5432/tchannels", echo=True)
+# engine = create_engine("postgresql+psycopg://danielgehrman:@localhost:5432/tchannels", echo=True)
+engine = create_engine("postgresql+psycopg://admin:@localhost:5432/tchannels", echo=True)
 
 Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(bind=engine)
