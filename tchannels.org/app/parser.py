@@ -75,7 +75,7 @@ def parse(channel_username=None, o=None, last=None, **flags) -> list[Post]:
 
     with sync_playwright() as p:
         print("Starting playwright...")
-        browser =  p.webkit.launch()
+        browser =  p.chromium.launch()
         page =  browser.new_page()
         print("Loading page...")
         page.goto(BASE_URL + channel_username[1:]) # <–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
