@@ -77,7 +77,7 @@ class Post():
         # out = f"{self.post_id},{self.post_link},{self.author_name},{self.author_link},{self.post_datetime},{self.last_scrape_datetime},\({' '.join((self.content_text).split())}\),{self.content_img},{self.views}"
         return self.serialize()
 
-    def _parse_views(s: str) -> int:
+    def _parse_views(self, s: str) -> int:
         s = s.strip()
         if s.endswith("K"):
             return round(float(s[:-1]) * 1_000)
@@ -89,7 +89,7 @@ class Post():
         channel_id, post_id = self.post_id.split("/")
 
         return {
-            "post_id":              int(post_id),
+            "post_id":              self.post_id,
             "channel_id":           channel_id,
             "author_name":          self.author_name,
             "post_datetime":        datetime.fromisoformat(self.post_datetime),

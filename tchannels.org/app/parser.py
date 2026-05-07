@@ -34,7 +34,7 @@ def arg_parser_init():
     return parser
 
 
-def parse(channel_username=None, o=None, last=None, **flags):
+def parse(channel_username=None, o=None, last=None, **flags) -> list[Post]:
 
     parser = arg_parser_init()
 
@@ -83,7 +83,8 @@ def parse(channel_username=None, o=None, last=None, **flags):
         # check to see what ended up loading (the channel page or telegram.org fallback)
         if page.url != (BASE_URL + channel_username[1:]):
             print(f'{page.url} loaded instead! This ain\'t a channel!!! Goodbye')
-            return 2
+            browser.close()
+            return []
 
         print("Parsing the posts...")
 
@@ -114,7 +115,7 @@ def parse(channel_username=None, o=None, last=None, **flags):
                 else:
                     print("bro 'h', 'd' or 'p' nothing else")
                     browser.close()
-                    return 2
+                    return []
 
                 # print(f"now: {datetime_now}\tthen:{datetime_then}\t{oldest_loaded_post_datetime=}")
                 # print(datetime_then < oldest_loaded_post_datetime)
@@ -142,15 +143,16 @@ def parse(channel_username=None, o=None, last=None, **flags):
 
         browser.close()
 
-    print(f"Saving to: {args.o}")
-    # writing posts to output file
-    with open(args.o, "w") as f:
-        f.write(",".join(active_flags) + "\n")
+    # print(f"Saving to: {args.o}")
+    # # writing posts to output file
+    # with open(args.o, "w") as f:
+    #     f.write(",".join(active_flags) + "\n")
         
-        for post in posts:
-            f.write(post.serialize(active_flags) + "\n")
+    #     for post in posts:
+    #         f.write(post.serialize(active_flags) + "\n")
 
     print(f"Done!\nGoodbye")
+    return posts
     
 
 if __name__ == '__main__':

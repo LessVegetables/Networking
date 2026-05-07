@@ -50,8 +50,21 @@ class Post(Base):
     content_text: Mapped[str]
     content_img: Mapped[list[str]] = mapped_column(ARRAY(String))
 
-    def __repr__(self) -> str:
-         return f"Post(name={self.post_id!r}, fullname={self.channel_id!r})"
+    def __repr__(self):
+        return f"Post(post_id={self.post_id!r}, post_datetime={self.post_datetime!r})"
+    
+    def to_dict(self): # -> dict:
+        temp = {
+            "post_id": self.post_id,
+            "channel_id": self.channel_id,
+            "author_name": self.author_name,
+            "post_datetime": self.post_datetime,
+            "last_scrape_datetime": self.last_scrape_datetime,
+            "views": self.views,
+            "content_text": self.content_text,
+            "content_img": self.content_img,
+        }
+        return temp
 
 # engine = create_engine("sqlite:///temp.db", echo=True)
 engine = create_engine("postgresql+psycopg://danielgehrman:@localhost:5432/tchannels", echo=True)
@@ -79,3 +92,25 @@ def post_exists(post):
 #             existing_post = post
 #             session.execute(select(Post.post_id)) #autoflush 
 #         session.commit()
+
+def return_posts(channel, params, last):
+    # return {"posts": [{"channel": channel}, {"last": last}]}
+    result = {"posts": []}
+
+    params_keys = list(params.keys())
+    
+    if len(params_keys) != 0:
+        with SessionLocal() as session:
+            columns = [getattr(Post, k) for k in params_keys]
+            for col in columns:
+                print(f"{col=}")
+            stmt = select(*columns).where(str(Post.channel_id) == channel)
+            rows = session.execute(stmt).all()
+    else:
+        with SessionLocal() as session:
+            stmt = select(Post)
+            rows = session.execute(stmt).first()
+    # result["posts"].append(rows)
+    # return result
+
+    return rows

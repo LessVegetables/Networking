@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from parser import parse
 
-from database import SessionLocal, post_exists
+from database import SessionLocal, post_exists, return_posts
 from database import Post as DbPost
 
 # ADD channel_id PARSE
@@ -45,7 +45,7 @@ def parse_channel(channel: str, last: str = "10p"):
     return {"parsed channel": channel, "last": last}
 
 @app.get("/data/{channel}")
-def read_postst_from_channel(channel: str, request: Request):
+def read_postst_from_channel(channel: str, request: Request, last: str = "1p"):
     # get list(Post) of posts
     # return 500smth if posts dating n hours/days back don't exist
     # serialize all the posts
@@ -61,8 +61,17 @@ def read_postst_from_channel(channel: str, request: Request):
         else:
             params.pop(k)
     
-    d = request.query_params.get("d")
+    # d = request.query_params.get("d")
 
-    parse(f'@{channel}', o='out.csv', last=['5', 'd'], flags=params)
+    # result = return_posts(channel, params, last) ################################################
 
-    return {"parsed channel": channel, "params": params}
+
+    with SessionLocal() as session:
+            from sqlalchemy import select
+            stmt = select(DbPost) #.where(DbPost.channel_id == channel)
+            result = session.scalars(stmt).first()
+
+    # parse(f'@{channel}', o='out.csv', last=['5', 'd'], flags=params)
+    # return {"parsed channel": channel, "params": params}
+    
+    return result.to_dict()
