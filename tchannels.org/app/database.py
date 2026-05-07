@@ -1,6 +1,8 @@
 from datetime import datetime, timezone, timedelta
+import os
 from typing import List
 from typing import Optional
+
 from sqlalchemy import create_engine
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
@@ -73,7 +75,8 @@ class Post(Base):
 
 # engine = create_engine("sqlite:///temp.db", echo=True)
 # engine = create_engine("postgresql+psycopg://danielgehrman:@localhost:5432/tchannels", echo=True)
-engine = create_engine("postgresql+psycopg://admin:@localhost:5432/tchannels", echo=True)
+# engine = create_engine("postgresql+psycopg://admin:@localhost:5432/tchannels", echo=True)
+engine = create_engine(os.environ["DATABASE_URL"], echo=True)
 
 Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(bind=engine)
