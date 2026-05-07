@@ -45,7 +45,7 @@ def parse_channel(channel: str, last: str = "10p"):
     return {"parsed channel": channel, "last": last}
 
 @app.get("/data/{channel}")
-def read_postst_from_channel(channel: str, request: Request, last: str = "1p"):
+def read_postst_from_channel(channel: str, request: Request, last: str = "10p"):
     # get list(Post) of posts
     # return 500smth if posts dating n hours/days back don't exist
     # serialize all the posts
@@ -57,21 +57,25 @@ def read_postst_from_channel(channel: str, request: Request, last: str = "1p"):
 
     for k in params_keys:
         if k in FLAGS:
+            if k == 'last':
+                params.pop(k)
+                continue
             params[k] = True
         else:
             params.pop(k)
     
     # d = request.query_params.get("d")
+    print(f"\t{channel=}\n\t{params=}\n\t{last=}")
+    result = return_posts(channel, params, last) ################################################
 
-    # result = return_posts(channel, params, last) ################################################
 
-
-    with SessionLocal() as session:
-            from sqlalchemy import select
-            stmt = select(DbPost) #.where(DbPost.channel_id == channel)
-            result = session.scalars(stmt).first()
+    # with SessionLocal() as session:
+    #         from sqlalchemy import select
+    #         stmt = select(DbPost) #.where(DbPost.channel_id == channel)
+    #         result = session.scalars(stmt).first()
 
     # parse(f'@{channel}', o='out.csv', last=['5', 'd'], flags=params)
     # return {"parsed channel": channel, "params": params}
     
-    return result.to_dict()
+    print(f"{len(result["posts"])=}")
+    return result
