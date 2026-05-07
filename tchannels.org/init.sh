@@ -16,7 +16,7 @@ docker build -t tchannels_image -f ./app/dockerfile ./app/
 
 docker run -d \
     --network tchan_net \
-    -p 127.0.0.1:8501:80 \
+    -p 127.0.0.1:10118:80 \
     --restart unless-stopped \
     --name tchannels_app \
     tchannels_image
