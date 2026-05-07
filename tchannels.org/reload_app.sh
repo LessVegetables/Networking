@@ -7,4 +7,5 @@ docker run -d \
     --network tchan_net \
     --restart unless-stopped \
     --name tchannels_app \
+    -e DATABASE_URL=postgresql+psycopg://admin:secret@tchannels_db:5432/tchannels \
     tchannels_image
