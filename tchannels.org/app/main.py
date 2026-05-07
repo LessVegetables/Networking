@@ -12,7 +12,7 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Available Paramaters": FLAGS}
 
 @app.get("/parse/{channel}")
 def parse_channel(channel: str, last: str = "10p"):
