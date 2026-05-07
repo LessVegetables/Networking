@@ -1,5 +1,5 @@
 #!/bin/bash
-docker build -t tchannels_image -f ./app/dockerfile ./app/
+docker build --no-cache -t tchannels_image -f ./app/dockerfile ./app/
 docker stop tchannels_app || true
 docker rm tchannels_app || true
 docker run -d \
