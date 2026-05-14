@@ -6,7 +6,7 @@ from database import Post as DbPost
 
 # ADD channel_id PARSE
 # INT the view count
-FLAGS = ["post_id", "post_link", "author_name", "author_link", "datetime", "last_scrape_datetime", "views", "content_text", "content_img", "last"]
+FLAGS = ["post_id", "post_link", "author_name", "author_link", "post_datetime", "last_scrape_datetime", "views", "content_text", "content_img", "last"]
 
 app = FastAPI()
 

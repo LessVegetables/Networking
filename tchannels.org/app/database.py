@@ -65,7 +65,7 @@ class Post(Base):
 
     def __repr__(self):
         return f"Post(post_id={self.post_id!r}, post_datetime={self.post_datetime!r})"
-    
+   
     def to_dict(self, wanted: set[str] = None): # -> dict:
         if len(wanted) == 0:
             fields = self.FIELDS
